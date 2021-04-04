@@ -19,7 +19,7 @@
     }
 ?>
 <head>
-    <title>
+    <title> 
         Hello bois
     </title>
 </head>
