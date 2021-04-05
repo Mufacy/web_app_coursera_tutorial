@@ -28,15 +28,18 @@
         if(strlen($make) < 1)
         {
             $_SESSION['failed'] = "Make is required";
+            unset($_SESSION['make']);
             header("Location: add.php");
-        // echo('<p "style=color:red">Make is required </p> \n');
+            return;
         }
         else
         if (!is_numeric($year) || !is_numeric($mileage))
         {
             $_SESSION['failed'] = "Mileage and year must be numeric";
+            unset($_SESSION['year']);
+            unset($_SESSION['mileage']);
             header("Location: add.php");
-        // echo('<p "style=color:red">Mileage and year must be numeric </p> \n');  
+            return;  
         }
         else
         {
@@ -54,7 +57,11 @@
             if($stmt->execute())
             {
                 $_SESSION["success"] = "Record inserted";
+                unset($_SESSION['make']);
+                unset($_SESSION['year']);
+                unset($_SESSION['mileage']);
                 header("Location: view.php");
+                return;
             }
         }
     }
@@ -71,17 +78,7 @@
             echo('<p style="color:red">'.$_SESSION["failed"]."</p>\n");
             unset($_SESSION["failed"]);
         }  
-    
-        // Check if we are logged in!
-        if ( ! isset($_SESSION["account"]) ) 
-        { ?>
-        <p>Please <a href="login.php">Log In</a> to start.</p>
-        <?php } 
-        else 
-        { ?>
-        <p>This is where a cool application would be.</p>
-        <p>Please <a href="logout.php">Log Out</a> when you are done.</p>
-        <?php } ?>
+    ?>
         <div class="container">
             <form method="post">
                 <p>Make: <input type="text" name="make" size="60"/></p>

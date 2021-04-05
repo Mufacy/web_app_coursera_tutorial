@@ -20,7 +20,7 @@
     $databaseService =  new databaseService();
     $conn = $databaseService->getConnection();
 
-    $query = "SELECT * FROM autos";
+    $query = "SELECT auto_id, make, year, mileage FROM autos";
 
     $stmt = $conn->prepare($query);
 ?>
@@ -34,10 +34,9 @@
         {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
             {
-                echo ("<p> Id: ". htmlentities($row['Task_Descr']));
-                echo (" make: ". htmlentities($row['Task_Detail']));
-                echo (" year: ". htmlentities($row['Task_Start_Date']));
-                echo (" mileage: ". htmlentities($row['Task_End_Date'] . "</p>\n"));
+                echo ("<p>" . htmlentities($row['year']));
+                echo (" ". htmlentities($row['make']));
+                echo (" / ". htmlentities($row['mileage'] ). "</p>\n");
             }
         }
     ?>

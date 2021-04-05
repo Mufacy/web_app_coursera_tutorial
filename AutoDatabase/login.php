@@ -1,35 +1,35 @@
 <?php
-    include_once "./PDO.php";
     session_start();
-
-    if ( isset($_POST["account"]) && isset($_POST["pw"]) ) 
+    include_once "./PDO.php";
+    
+    if ( isset($_POST["email"]) && isset($_POST["pass"]) ) 
     {
-        if ( strlen($_POST['account']) < 1 || strlen($_POST["pw"]) < 1)
+        if ( strlen($_POST["email"]) < 1 || strlen($_POST["pass"]) < 1)
         {
-            $_SESSION['error'] = "Email and password are required";
+            $_SESSION["error"] = "Email and password are required";
             header( 'Location: login.php' ) ;
             return;
         }
 
-        unset($_SESSION["account"]);  // Logout current user
-        if ( strpos( $_POST['account'], '@') < 1 ) 
+        unset($_SESSION["email"]);  // Logout current user
+        if ( strpos( $_POST["email"], '@') < 1 ) 
         {
-            $_SESSION['error'] = "Email must have an at-sign (@)";
+            $_SESSION["error"] = "Email must have an at-sign (@)";
             header('Location: login.php');
             return;
         }
 
-        $password = hash('md5', 'salt'+$_POST['pw']);
-        if ( $_POST['pw'] == $password ) 
+        $password = 'php123';
+        if ( $_POST['pass'] == $password ) 
         {
-            $_SESSION['success'] = "Logged in.";    
-            $_SESSION['name'] = $_POST['email'];
+            $_SESSION["success"] = "Logged in.";    
+            $_SESSION["name"] = $_POST["email"];
             header('Location: view.php');
             return;
         } 
         else 
         {
-            $_SESSION['error'] = "Incorrect password.";
+            $_SESSION["error"] = "Incorrect password.";
             header( 'Location: login.php' ) ;
             return;
         }
@@ -37,6 +37,7 @@
 ?>
 <html>
 <head>
+<title>Mohamad Mouaz Al Midani's Automobile Tracker</title>
 </head>
 <body style="font-family: sans-serif;">
 <h1>Please Log In</h1>
@@ -48,10 +49,9 @@
     }
 ?>
     <form method="post">
-        <p>Account: <input type="text" name="account" value=""></p>
-        <p>Password: <input type="text" name="pw" value=""></p>
+        <p>Account: <input type="text" name="email" value=""></p>
+        <p>Password: <input type="text" name="pass" value=""></p>
         <!-- password is umsi -->
-        <p><input type="submit" value="Log In">
-        <a href="app.php">Cancel</a></p>
+        <p><input type="submit" value="Log In"><a href="index.php">Cancel</a></p>
     </form>
 </body>
