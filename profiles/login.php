@@ -1,5 +1,6 @@
 <?php
     include_once "./PDO.php";
+    session_start();
     $databaseService = new databaseService();
     $conn = $databaseService->getConnection();
 
@@ -28,7 +29,7 @@
         $query = "select user_id, name from users where email = :em and password = :pw";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':em', $email);
-        $stmt->bindParam(':pw', $pass);
+        $stmt->bindParam(':pw', $check);
 
         $stmt->execute();
 
