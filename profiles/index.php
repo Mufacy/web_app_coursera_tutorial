@@ -6,15 +6,17 @@
     $databaseService = new databaseService();
     $conn = $databaseService->getConnection();
 
-    $query = "select Name, Headline from users join profile ON users.user_id = profile.user_id";
+    $query = "select profile.first_Name, Headline, profile.user_id,
+                    profile.profile_id from users join profile ON users.user_id = profile.user_id";
 
     $stmt = $conn->prepare($query);
 
     $stmt->execute();
 ?>
-<!DOCHTML>
 <html>
-<head> <title>Mohamad Mouaz Al Midani's Resume Registry</title> </head>
+<head> 
+    <title>Mohamad Mouaz Al Midani's Resume Registry</title> 
+</head>
 
 <body>
     <h1>Mohamad Mouaz Al Midani's Resume Registry</h1>
@@ -24,6 +26,7 @@
             echo ('<p style="color:green;">'.$_SESSION['success']."</p>\n");
             unset($_SESSION['success']);
         }
+
         if (!isset($_SESSION['user_id']))
         {
             echo('<a href="login.php">Please log in</a>'. "\n");
@@ -32,19 +35,29 @@
         {
             echo('<a href="logout.php">Logout</a>'. "\n");
         }
-
-
+    ?>
+    <table border="1">
+    
+    <tr> 
+        <td>Name    </td>
+        <td>Headline</td>
+        <td>Action  </td>
+    </tr>
+    
+    <?php
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
             echo ("<tr>");
-            echo ("<td>".$row['Name']."</td>");
-            echo ("<td>".$row['Headline']."</td>");
-            if (isset($_SESSION['user_id']))
+            echo ('<td> <a href="view.php?profile_id='.$row['profile_id'].'">'. htmlentities($row['first_Name']) ."</td>");
+            echo ("<td>". htmlentities($row['Headline']) ."</td>");
+            if (isset($_SESSION['user_id']) && ($row['user_id'] == $_SESSION['user_id']))
             {
-                echo ('<td> <a href="Edit.php?profile_id=">Edit</a> | 
-                            <a href="Delete.php?profile_id=">Delete</a>' . "</td>");   
+                echo("<td>");
+                echo('<a href="edit.php?profile_id='.$row['profile_id'].'">Edit</a> / ');
+                echo('<a href="delete.php?profile_id='.$row['profile_id'].'">Delete</a>');
+                echo("</td>");
             }
-            echo ("</tr>");
+            echo ("</tr>\n");
         }
 
         if (isset($_SESSION['userId']))

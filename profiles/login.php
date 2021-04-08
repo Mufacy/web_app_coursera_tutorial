@@ -70,7 +70,7 @@
     <p>
     Password:<input name="pass" id="pass" type="password"/>
     </p>
-    <input type="submit" onclick="return doValidate();"  value="Log in" />
+    <input type="submit" onclick="return doValidate();"  value="Log In" />
     <input type="submit" name="cancel" value="Cancel">
 </form>
 

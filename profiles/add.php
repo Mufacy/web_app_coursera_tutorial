@@ -31,31 +31,38 @@
             header('Location:add.php');
             return;
         }
+
+        $databaseService = new databaseService();
+        $conn = $databaseService->getconnection();
+
+        $query = "INSERT INTO profile SET user_id = :uid,
+                            first_name = :fname, last_name = :lname,
+                            email = :email, headline = :headline,
+                            summary = :summary";
+
+        $stmt = $conn->prepare($query);
+
+        $stmt->bindParam(':uid',$uid);
+        $stmt->bindParam(':fname',$fname);
+        $stmt->bindParam(':lname',$lname);
+        $stmt->bindParam(':email',$email);
+        $stmt->bindParam(':headline',$headline);
+        $stmt->bindParam(':summary',$summ);
+
+        if($stmt->execute())
+        {
+            $_SESSION['success'] = "Profile added";
+            header('Location:index.php');
+            return;
+        }
+        else
+        {
+            $_SESSION['error'] = "Failed to add profile";
+            header('Location:add.php');
+            return;
+        }
     }
     
-    $databaseService = new databaseService();
-    $conn = $databaseService->getconnection();
-
-    $query = "INSERT INTO profile SET user_id = :uid,
-                        first_name = :fname, last_name = :lname,
-                        email = :email, headline = :headline,
-                        summary = :summary";
-
-    $stmt = $conn->prepare($query);
-
-    $stmt->bindParam(':uid',$uid);
-    $stmt->bindParam(':fname',$fname);
-    $stmt->bindParam(':lname',$lname);
-    $stmt->bindParam(':email',$email);
-    $stmt->bindParam(':headline',$headline);
-    $stmt->bindParam(':summary',$summ);
-
-    if($stmt->execute())
-    {
-        $_SESSION['success'] = "Profile added";
-        header('Location:index.php');
-        return;
-    }
     $name = $_SESSION['name'];
 ?>
 <head>
