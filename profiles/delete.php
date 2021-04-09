@@ -40,7 +40,7 @@ if ( $row === false )
 }
 
 ?>
-<head> <title> Mohamad Mouaz Al Midani's profile</title> </head>
+<head> <title> Mohamad Mouaz Al Midani's Profile Delete</title> </head>
 <p>Confirm: Deleting <?= htmlentities($row['first_name']) . " " . htmlentities($row['last_name'])?></p>
 
 <form method="post">

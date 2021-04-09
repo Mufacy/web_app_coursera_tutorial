@@ -2,7 +2,6 @@
     include_once "./PDO.php";
     session_start();
 
-
     $databaseService = new databaseService();
     $conn = $databaseService->getConnection();
 
@@ -15,11 +14,11 @@
 ?>
 <html>
 <head> 
-    <title>Mohamad Mouaz Al Midani's Resume Registry</title> 
+    <title>80d68c37 Resume Registry</title>
 </head>
 
 <body>
-    <h1>Mohamad Mouaz Al Midani's Resume Registry</h1>
+    <h1>80d68c37 Resume Registry</h1>
     <?php
         if (isset($_SESSION['success']))
         {

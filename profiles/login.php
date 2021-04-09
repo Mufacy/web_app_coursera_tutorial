@@ -54,7 +54,7 @@
 ?>
 <!DOCTYPE html>
 <html>
-<head> <title>Chuck Severance's Login Page</title> 
+<head> <title>Mohamad Mouaz Al Midani's Login Page</title> 
 </head>
 <body>
 <h1> Please Log In </h1>

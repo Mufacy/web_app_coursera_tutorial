@@ -94,7 +94,7 @@
     $name     = $_SESSION['name'];
 ?>
 <head>
-    <title>Mohamad Mouaz Al Midani's Profile Add</title>
+    <title>Mohamad Mouaz Al Midani's Profile Edit</title>
 </head>
     <body>
     <div class="container">
