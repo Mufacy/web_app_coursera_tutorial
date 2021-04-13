@@ -1,5 +1,6 @@
 <?php
     include_once "./PDO.php";
+    require_once('head.php');   
     session_start();
 
     $databaseService = new databaseService();

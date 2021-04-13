@@ -1,7 +1,7 @@
-
 <?php
     include_once "./PDO.php";
     include_once "./util.php";
+    include_once "./head.php";
     session_start();
 
     if (!isset($_SESSION['name']) || !isset( $_SESSION['user_id'] ))
@@ -19,6 +19,20 @@
     $databaseService = new databaseService();
     $conn = $databaseService->getconnection();
 
+    //load up the profile in question
+    $stmt = $conn->prepare('SELECT * FROM profile 
+                            where profile_id = :prof AND user_id = :uid');
+    $stmt->execute(array(':prof' => $_REQUEST['profile_id'],
+                         ':uid' => $_SESSION['user_id']));
+
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($profile === false)
+    {
+        $_SESSION['error'] = "Could not load profile";
+        header('Location: index.php');
+        return;
+    }
+
     $pid = $_GET['profile_id'];
 
     if (isset($_POST['first_name']) && isset($_POST['last_name']) && isset($_POST['email'])
@@ -35,6 +49,15 @@
 
         //validating the position data
         $msg = validatePos();
+        if (is_string($msg))
+        {
+            $_SESSION['error'] = $msg;
+            header('Location: add.php');
+            return;
+        }
+
+        //validating the Education data
+        $msg = validateEdu();
         if (is_string($msg))
         {
             $_SESSION['error'] = $msg;
@@ -68,37 +91,26 @@
         if($stmt->execute())
         {
             $profile_id = $_REQUEST['profile_id'];
-            //delete all old entries
+            
+            //delete all old entries for Position
             $stmt = $conn->prepare('DELETE FROM Position WHERE profile_id = :profile_id');
 
             $stmt->bindParam(':profile_id', $profile_id);
 
             $stmt->execute();
 
-            //insert 
-            $stmt = $conn->prepare('INSERT INTO Position (profile_id, rank, year, description) VALUES ( :pid, :rank, :year, :desc)');
+            //delete all old entries for Education
+            $stmt = $conn->prepare('DELETE FROM education WHERE profile_id = :profile_id');
 
-            $rank = 1;
-            for($i=1; $i<=9; $i++) 
-            {
-                if ( ! isset($_POST['year'.$i]) ) continue;
-                if ( ! isset($_POST['desc'.$i]) ) continue;
+            $stmt->bindParam(':profile_id', $profile_id);
 
-                $year = $_POST['year'.$i];
-                $desc = $_POST['desc'.$i];
-                $stmt = $conn->prepare('INSERT INTO Position
-                    (profile_id, rank, year, description)
-                    VALUES ( :pid, :rank, :year, :desc)');
+            $stmt->execute();
 
-                $stmt->execute(array(
-                ':pid' => $profile_id,
-                ':rank' => $rank,
-                ':year' => $year,
-                ':desc' => $desc)
-                );
 
-                $rank++;
-            }
+            //insert positions and education
+            insertPos($conn, $profile_id);
+            insertEdu($conn, $profile_id);
+
             $_SESSION['success'] = "Profile updated";
             header('Location:index.php');
             return;
@@ -140,7 +152,6 @@
 ?>
 <head>
     <title>Mohamad Mouaz Al Midani's Profile Edit</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
 </head>
     <body>
     <div class="container">
@@ -163,7 +174,31 @@
             <input type="text" name="headline" size="80" value="<?= $headline ?>"/></p>
             <p>Summary:<br/>
             <textarea name="summary" rows="8" cols="80"><?= $summ ?></textarea>
+            School: <input type="text" size="80" name="edu_school1" class="school" value="" />
             <p>
+            Education: <input type="submit" value="+" id="addEdu">
+            </p>
+            <div id="edu_fields">
+                <?php
+                    $query = "SELECT institution.name, education.year FROM institution join education
+                            ON institution.institution_id = education.institution_id
+                            where education.profile_id = :profile_id
+                            ORDER BY rank";
+
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':profile_id', $pid);
+                    $stmt->execute();
+                    $eduCount = 0;
+                    while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                    {
+                        $eduCount++;
+                        echo('<div id="edu'.$eduCount.'">');
+                        echo('<p>Year: <input type="text" name="edu_year'.$eduCount.'" value="'.htmlentities($row['year']).'">');
+                        echo('<input type="button" value="-" onclick="$('."'#edu".$eduCount."').remove();  return false;".'"></p>');
+                        echo('<p>School: <input type="text" size="80" class="school" name="edu_school'.$eduCount.'" value="'.htmlentities($row['name']).'"> </div>');
+                    }
+                ?>
+            </div>
             <p>
             Position: <input type="submit" value="+" id="addPos">
             </p>
@@ -181,6 +216,7 @@
                 }
             ?>
             </div>
+            <p>
             <input type="hidden" name="profile_id" value="<?= $pid ?>"/>
             <input type="submit" value="Save">
             <input type="submit" name="cancel" value="Cancel">
@@ -224,7 +260,9 @@
         (   
             function ()
             {
+            $('.school').autocomplete({ source: "school.php" });
             window.console && console.log('Document ready called');
+            countEdu = <?= $eduCount ?>;
             countPos = <?= $posCount ?>;
             $('#addPos').click
                 (
@@ -247,8 +285,42 @@
                         );
                     }
                 )
+
+             //add Education on click
+             $('#addEdu').click
+                (
+                    function (event)
+                    {
+                        event.preventDefault();
+                        if (countEdu >= 9)
+                        {
+                            alert("Maximum of nine education entries exceeded");
+                            return;
+                        }
+                        countEdu++;
+                        window.console && console.log("Adding position"+countEdu);
+                        var source = $('#edu-template').html();
+                        $('#edu_fields').append(source.replace(/@COUNT@/g, countEdu));
+
+                        //Add the event handler to the new ones
+                        $('.school').autocomplete({
+                        source: "school.php"
+                        })
+                    }
+                    
+                )
             }
         )
+    </script>
+
+    <!-- HTML with substitution hot spots -->
+    <script id="edu-template" type="text">
+        <div id="edu@COUNT@">
+            <p>Year: <input type="text" name="edu_year@COUNT@" value="" />
+            <input type="button" value="-" onclick="$('#edu@COUNT@').remove(); return false;"><br>
+            <p>School: <input type="text" size="80" name="edu_school@COUNT@" class="school" value="" />
+            </p>
+        </div>
     </script>
 </body>
 </html>

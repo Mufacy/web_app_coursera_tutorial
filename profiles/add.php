@@ -2,6 +2,7 @@
 <?php
     include_once "./PDO.php";
     include_once "./util.php";
+    require_once "./head.php";
     session_start();
 
     if (!isset($_SESSION['name']) || !isset( $_SESSION['user_id'] ))
@@ -23,6 +24,15 @@
 
         //validating the position data
         $msg = validatePos();
+        if (is_string($msg))
+        {
+            $_SESSION['error'] = $msg;
+            header('Location: add.php');
+            return;
+        }
+
+        //validating the Education data
+        $msg = validateEdu();
         if (is_string($msg))
         {
             $_SESSION['error'] = $msg;
@@ -57,30 +67,8 @@
         if($stmt->execute())
         {
             $profile_id = $conn->lastInsertId();
-            
-            $stmt = $conn->prepare('INSERT INTO Position (profile_id, rank, year, description) VALUES ( :pid, :rank, :year, :desc)');
-
-            $rank = 1;
-            for($i=1; $i<=9; $i++) 
-            {
-                if ( ! isset($_POST['year'.$i]) ) continue;
-                if ( ! isset($_POST['desc'.$i]) ) continue;
-
-                $year = $_POST['year'.$i];
-                $desc = $_POST['desc'.$i];
-                $stmt = $conn->prepare('INSERT INTO Position
-                    (profile_id, rank, year, description)
-                    VALUES ( :pid, :rank, :year, :desc)');
-
-                $stmt->bindParam(':pid',$profile_id);
-                $stmt->bindParam(':rank',$rank);
-                $stmt->bindParam(':year',$year);
-                $stmt->bindParam(':desc',$desc);
-                
-                $stmt->execute();
-
-                $rank++;
-            }
+            insertPos($conn, $profile_id);
+            insertEdu($conn, $profile_id);
             $_SESSION['success'] = "Profile added";
             header('Location:index.php');
             return;
@@ -97,7 +85,6 @@
 ?>
 <head>
     <title>Mohamad Mouaz Al Midani's Profile Add</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
 </head>
     <body>
     <div class="container">
@@ -120,6 +107,11 @@
             <input type="text" name="headline" id="headline" size="80"/></p>
             <p>Summary:<br/>
             <textarea name="summary" id="summary" rows="8" cols="80"></textarea>
+            </p>
+            <p>
+            Education: <input type="submit" value="+" id="addEdu">
+            </p>
+            <div id="edu_fields"></div>
             <p>
             Position: <input type="submit" value="+" id="addPos">
             </p>
@@ -163,11 +155,12 @@
         }
 
         countPos = 0;
+        countEdu = 0;
         $(document).ready
         (   function ()
             {
-            window.console && console.log('Document ready called');
-            $('#addPos').click
+                window.console && console.log('Document ready called');
+                $('#addPos').click
                 (
                     function (event)
                     {
@@ -188,8 +181,43 @@
                         );
                     }
                 )
+                //add Education on click
+                $('#addEdu').click
+                (
+                    function (event)
+                    {
+                        event.preventDefault();
+                        if (countEdu >= 9)
+                        {
+                            alert("Maximum of nine education entries exceeded");
+                            return;
+                        }
+                        countEdu++;
+                        window.console && console.log("Adding position"+countEdu);
+                        var source = $('#edu-template').html();
+                        $('#edu_fields').append(source.replace(/@COUNT@/g, countEdu));
+
+                        //Add the event handler to the new ones
+                        $('.school').autocomplete({
+                        source: "school.php"
+                        })
+                    }
+                    
+                )
+
+                
             }
         )
+    </script>
+
+    <!-- HTML with substitution hot spots -->
+    <script id="edu-template" type="text">
+        <div id="edu@COUNT@">
+            <p>Year: <input type="text" name="edu_year@COUNT@" value="" />
+            <input type="button" value="-" onclick="$('#edu@COUNT@').remove(); return false;"><br>
+            <p>School: <input type="text" size="80" name="edu_school@COUNT@" class="school" value="" />
+            </p>
+        </div>
     </script>
 </body>
 </html>

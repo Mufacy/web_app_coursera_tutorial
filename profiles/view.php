@@ -1,5 +1,7 @@
 <?php
     include_once "./PDO.php";
+    include_once "./util.php";
+    include_once "./head.php";
     session_start();
 
     if ( ! isset($_GET['profile_id']) ) 
@@ -30,14 +32,6 @@
     $headline = htmlentities($row['headline']);
     $summ     = htmlentities($row['summary']);
     $pid      = htmlentities($row['profile_id']);
-
-    $query = "SELECT rank, year, description FROM position where profile_id = :profile_id";
-
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':profile_id', $pid);
-    $stmt->execute();
-
-    $rowCounts = $stmt->rowCount();
 ?>
 <head> <title>Mohamad Mouaz Al Midani's Profile View</title> <head>
 <body>
@@ -48,20 +42,38 @@
 <p>Headline: <?= $headline ?></p>
 <p>Summary: <?= $summ ?></p>
 <?php
+
     //getting all the positions
-    if ($rowCounts > 0 )
+    $positions = loadPos($conn, $pid);
+    if (count($positions) > 0 )
     {
         echo('<p> Position: </p>');
         echo('<ul>');
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+        for($i = 0; $i < count($positions); $i++)
         {
+            $row = $positions[$i];
             echo('<li>');
             echo(htmlentities($row['year']).': ' . htmlentities($row['description']));
             echo('</li>');
         }
         echo('</ul>');
-    }
-    
+    }    
+
+    //getting all the Education
+    $Educations = loadEdu($conn, $pid);
+    if (count($Educations) > 0 )
+    {
+        echo('<p> Education: </p>');
+        echo('<ul>');
+        for($i = 0; $i < count($Educations) ; $i++)
+        {
+            $row = $Educations[$i];
+            echo('<li>');
+            echo(htmlentities($row['year']).': ' . htmlentities($row['name']));
+            echo('</li>');
+        }
+        echo('</ul>');
+    }    
 ?> 
 <a href="index.php">Done</a>
 </body>
