@@ -6,8 +6,5 @@
 
 <!DOCTYPE html>
 <html>
-<head> <title>Mohamad Mouaz Al Midani's Logout Page</title> 
-</head>
-<body>
-</body>
+<head> <title>Mohamad Mouaz Al Midani's Logout Page</title> </head>
 </html>

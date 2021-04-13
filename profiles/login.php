@@ -65,42 +65,13 @@
             unset($_SESSION['error']);
         }
     ?>
-<form method="post" action="login.php">
-    Email:<input name="email" id="email" type="text"/>
-    <p>
-    Password:<input name="pass" id="pass" type="password"/>
-    </p>
-    <input type="submit" onclick="return doValidate();"  value="Log In" />
-    <input type="submit" name="cancel" value="Cancel">
-</form>
-
-<script>
-function doValidate() 
-{
-    console.log('Validating...');
-    try 
-    {
-        addr = document.getElementById('email').value;
-        pw = document.getElementById('pass').value;
-        console.log("Validating addr="+addr+" pw="+pw);
-        if (addr == null || addr == "" || pw == null || pw == "") 
-        {
-            alert("Both fields must be filled out");
-            return false;
-        }
-        if ( addr.indexOf('@') == -1 ) 
-        {
-            alert("Invalid email address");
-            return false;
-        }
-        return true;
-    } 
-    catch(e) 
-    {
-        return false;
-    }
-    return false;
-}
-</script>
+    <form method="post" action="login.php">
+        Email:<input name="email" id="email" type="text"/>
+        <p>
+        Password:<input name="pass" id="pass" type="password"/>
+        </p>
+        <input type="submit" onclick="return doValidate();"  value="Log In" />
+        <input type="submit" name="cancel" value="Cancel">
+    </form>
 </body>
 </html>

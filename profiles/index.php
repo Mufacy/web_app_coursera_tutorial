@@ -14,11 +14,11 @@
 ?>
 <html>
 <head> 
-    <title>80d68c37 Resume Registry</title>
+    <title>Mohamad Mouaz Al Midani Resume Registry</title>
 </head>
 
 <body>
-    <h1>80d68c37 Resume Registry</h1>
+    <h1>Mohamad Mouaz Al Midani Resume Registry</h1>
     <?php
         if (isset($_SESSION['success']))
         {

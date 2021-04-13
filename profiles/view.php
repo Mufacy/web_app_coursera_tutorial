@@ -30,6 +30,14 @@
     $headline = htmlentities($row['headline']);
     $summ     = htmlentities($row['summary']);
     $pid      = htmlentities($row['profile_id']);
+
+    $query = "SELECT rank, year, description FROM position where profile_id = :profile_id";
+
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':profile_id', $pid);
+    $stmt->execute();
+
+    $rowCounts = $stmt->rowCount();
 ?>
 <head> <title>Mohamad Mouaz Al Midani's Profile View</title> <head>
 <body>
@@ -38,6 +46,22 @@
 <p>Last Name: <?= $lname  ?></p>
 <p>Email: <?= $email ?></p>
 <p>Headline: <?= $headline ?></p>
-<p>Summary: <?= $summ ?></p> 
+<p>Summary: <?= $summ ?></p>
+<?php
+    //getting all the positions
+    if ($rowCounts > 0 )
+    {
+        echo('<p> Position: </p>');
+        echo('<ul>');
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+        {
+            echo('<li>');
+            echo(htmlentities($row['year']).': ' . htmlentities($row['description']));
+            echo('</li>');
+        }
+        echo('</ul>');
+    }
+    
+?> 
 <a href="index.php">Done</a>
 </body>
